@@ -23,6 +23,66 @@ foreach ($teams as &$entry) {
 	
 	if ($team_id != NULL) {
 		
+		//Already have team.  Update players entry.  Return team_id.
 		
+		$CIDArray = array();
+		
+		foreach ($teammembers as &$entry2) {
+			
+				$CIDArray[] = $entry2->CharacterID;		
+				
+				$stmt = $conn->prepare("UPDATE characters SET team_id = ? WHERE id = ? ");
+				
+				$stmt->bind_param("si", $team_id, $entry2->CharacterID);  // "s" means the database expects a string
+				
+				$stmt->execute();
+	
+				$stmt->close();				
+		}	
+		
+		$CharacterIDs = implode(",", $CIDArray);
+				
+		$stmt = $conn->prepare("UPDATE teams SET current_players = ? WHERE team_id = ? ");
+		
+		$stmt->bind_param("ss", $CharacterIDs, $team_id);  // "s" means the database expects a string
+		
+		$stmt->execute();
+	
+		$stmt->close();
+		
+	}
+	else {
+		
+		//Generate new team_id.
+		
+		
+		foreach ($teammembers as &$entry2) {
+			
+			$CIDArray[] = $entry2->CharacterID;		
+			
+			$stmt = $conn->prepare("UPDATE characters SET team_id = ? WHERE id = ? ");
+			
+			$stmt->bind_param("si", $team_id, $entry2->CharacterID);  // "s" means the database expects a string
+			
+			$stmt->execute();
+	
+			$stmt->close();				
+		}	
+		
+		$CharacterIDs = implode(",", $CIDArray);
+				
+		$stmt = $conn->prepare("INSERT INTO teams VALUES (?, ?)"); 
+		
+		$stmt->bind_param("ss", $team_id, $CharacterIDs);  // "s" means the database expects a string
+		
+		$stmt->execute();
+	
+		$stmt->close();
+		
+		}
+		
+		//Add team_id to response object.
+	}
 	
 }
+?>
