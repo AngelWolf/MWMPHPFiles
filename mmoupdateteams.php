@@ -6,6 +6,8 @@ $mydata = json_decode(file_get_contents('php://input'));
 
 $teams = $mydata->teams;
 
+$team_ids = array();
+
 foreach ($teams as &$entry) {
 	
 	$teammembers = $entry->teammembers;
@@ -55,6 +57,9 @@ foreach ($teams as &$entry) {
 		
 		//Generate new team_id.
 		
+		$team_id = substr(md5(rand()), 7, 10);		
+		
+		$CIDArray = array();
 		
 		foreach ($teammembers as &$entry2) {
 			
@@ -79,10 +84,14 @@ foreach ($teams as &$entry) {
 	
 		$stmt->close();
 		
-		}
-		
-		//Add team_id to response object.
 	}
+		
+	//Add team_id to response object.
+	$team_ids[] = $team_id;
 	
 }
+
+echo  json_encode(array('status'=>'OK', 'team_ids'=> $team_ids));
+
+
 ?>
