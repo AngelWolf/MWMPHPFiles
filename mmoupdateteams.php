@@ -10,7 +10,7 @@ $team_ids = array();
 
 $stmt = $conn->prepare("DELETE FROM teams WHERE server_id = ? ");
 
-$stmt->bind_param("s", htmlspecialchars(SID));
+$stmt->bind_param("s", SID);
 	
 $stmt->execute();
 	
@@ -54,7 +54,7 @@ foreach ($teams as &$entry) {
 		
 		$stmt = $conn->prepare("INSERT INTO teams VALUES ( ?, ?, ? )");
 
-		$stmt->bind_param("ssi", htmlspecialchars(SID), $team_id, $CharacterIDs);
+		$stmt->bind_param("ssi", SID, $team_id, $CharacterIDs);
 
 		$stmt->execute();
 		
@@ -86,7 +86,7 @@ foreach ($teams as &$entry) {
 				
 		$stmt = $conn->prepare("INSERT INTO teams VALUES (?, ?, ?)"); 
 		
-		$stmt->bind_param("ssi", htmlspecialchars(SID), $team_id, $CharacterIDs);  // "s" means the database expects a string
+		$stmt->bind_param("ssi", SID, $team_id, $CharacterIDs);  // "s" means the database expects a string
 		
 		$stmt->execute();
 	
