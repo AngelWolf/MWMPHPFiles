@@ -1,6 +1,8 @@
 <?php
-start_session();
+session_start();
 include_once "mmoconnection.php"; 
+
+$server_id = str_replace('PHPSESSID=', '', SID);
 
 $mydata = json_decode(file_get_contents('php://input'));
 
@@ -10,7 +12,7 @@ $team_ids = array();
 
 $stmt = $conn->prepare("DELETE FROM teams WHERE server_id = ? ");
 
-$stmt->bind_param("s", SID);
+$stmt->bind_param("s", $server_id);
 	
 $stmt->execute();
 	
@@ -39,7 +41,9 @@ foreach ($teams as &$entry) {
 		
 		foreach ($teammembers as &$entry2) {
 			
-				$CIDArray[] = $entry2->CharacterID;		
+				$CIDArray[] = $entry2->CharacterID;	
+
+				error_log($entry2->CharacterID, 0);
 				
 				$stmt = $conn->prepare("UPDATE characters SET team_id = ? WHERE id = ? ");
 				
@@ -54,7 +58,7 @@ foreach ($teams as &$entry) {
 		
 		$stmt = $conn->prepare("INSERT INTO teams VALUES ( ?, ?, ? )");
 
-		$stmt->bind_param("ssi", SID, $team_id, $CharacterIDs);
+		$stmt->bind_param("ssi", $server_id, $team_id, $CharacterIDs);
 
 		$stmt->execute();
 		
@@ -86,7 +90,7 @@ foreach ($teams as &$entry) {
 				
 		$stmt = $conn->prepare("INSERT INTO teams VALUES (?, ?, ?)"); 
 		
-		$stmt->bind_param("ssi", SID, $team_id, $CharacterIDs);  // "s" means the database expects a string
+		$stmt->bind_param("ssi", $server_id, $team_id, $CharacterIDs);  // "s" means the database expects a string
 		
 		$stmt->execute();
 	

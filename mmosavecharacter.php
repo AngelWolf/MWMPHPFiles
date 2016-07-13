@@ -22,13 +22,14 @@ $map_name = $mydata ->map_name;
 $posx = $mydata ->posx;
 $posy = $mydata ->posy;
 $posz = $mydata ->posz;
-$instance_flag = $mydata ->instance_flag;
+$in_instance = $mydata ->in_instance;
+$has_entered = $mydata ->has_entered;
 
 $yaw = $mydata ->yaw;
 
-$stmt = $conn->prepare("UPDATE characters SET health = ?, energy = ?, experience = ?, level = ?, map_name = ?, posx = ?, posy = ?, posz = ?, yaw = ?, instance_flag = ? WHERE id = ? ");
+$stmt = $conn->prepare("UPDATE characters SET health = ?, energy = ?, experience = ?, level = ?, map_name = ?, posx = ?, posy = ?, posz = ?, yaw = ?, in_instance = ?, has_entered = ? WHERE id = ? ");
 
-$stmt->bind_param("iiiisiiiiii", $health, $energy, $experience, $level, $map_name, $posx, $posy, $posz, $yaw, $instance_flag, $charid);  // "s" means the database expects a string
+$stmt->bind_param("iiiisiiiiiii", $health, $energy, $experience, $level, $map_name, $posx, $posy, $posz, $yaw, $in_instance?1:0, $has_entered?1:0, $charid);  // "s" means the database expects a string
 
 $stmt->execute();
 	
