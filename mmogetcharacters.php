@@ -25,18 +25,18 @@ else {
 
 		$stmt->close();
 		
-		$stmt = $conn->prepare("SELECT id, name, level FROM characters WHERE user_id = ? ");
+		$stmt = $conn->prepare("SELECT id, name, level, current_port FROM characters WHERE user_id = ? ");
 		
 		$stmt->bind_param("i", $userid);
 		
 		$stmt->execute();
 				
-		$stmt->bind_result($row_id, $row_name, $row_level );
+		$stmt->bind_result($row_id, $row_name, $row_level, $row_current_port );
 					
 		while ($stmt->fetch()) 
 		{
 			//add to array of characters:	
-			$chararray[] = array('id' => $row_id, 'name'=>$row_name, 'level'=>$row_level);
+			$chararray[] = array('id' => $row_id, 'name'=>$row_name, 'level'=>$row_level, 'current_port'=>$row_current_port);
 		}
 
 		echo json_encode(array('status'=>'OK', 'characters'=>$chararray));

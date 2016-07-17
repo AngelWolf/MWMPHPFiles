@@ -5,13 +5,14 @@ $mydata = json_decode(file_get_contents('php://input'));
 $charid = $mydata ->charid;
 $userid = $mydata ->userid;
 
-$stmt = $conn->prepare("SELECT name, health, energy, level, experience, posx, posy, posz, yaw FROM characters WHERE id = ? ");
+$stmt = $conn->prepare("SELECT name, health, energy, level, experience, posx, posy, posz, yaw, in_instance, has_entered, previous_port, current_port, pp_posx, pp_posy, pp_posz, pp_yaw FROM characters WHERE id = ? ");
 
 $stmt->bind_param("i", $charid);  // "i" means the database expects an integer
 
 $stmt->execute();
 
-$stmt->bind_result($row_name, $row_health, $row_energy, $row_level, $row_experience, $row_posx, $row_posy, $row_posz, $row_yaw);
+$stmt->bind_result($row_name, $row_health, $row_energy, $row_level, $row_experience, $row_posx, $row_posy, $row_posz, $row_yaw, $in_instance,
+$has_entered, $previous_port, $current_port, $pp_posx, $pp_posy, $pp_posz, $pp_yaw);
 
   // output data of each row
 if($stmt->fetch()) {
@@ -78,11 +79,21 @@ if($stmt->fetch()) {
 
 	}	
 	
-	
-	
+	if($in_instance == 0)  {
+		
 		echo  json_encode(array('status'=>'OK', 'name'=> $row_name, 'dialogues'=>$dialogues, 'quests'=>$quests, 'quest_nodes'=>$quest_nodes, 'health'=> $row_health, 
-		'energy'=> $row_energy, 'level'=> $row_level, 'experience'=> $row_experience,
-		'posx'=> $row_posx, 'posy'=> $row_posy, 'posz'=>$row_posz, 'yaw'=> $row_yaw ));		
+		'energy'=> $row_energy, 'level'=> $row_level, 'experience'=> $row_experience, 'posx'=> $row_posx, 'posy'=> $row_posy, 'posz'=>$row_posz, 'yaw'=> $row_yaw,
+		'current_port'=> $current_port, 'in_instance'=> $in_instance, 'has_entered'=> $has_entered ));
+		
+	}
+	else {
+		
+		echo  json_encode(array('status'=>'OK', 'name'=> $row_name, 'dialogues'=>$dialogues, 'quests'=>$quests, 'quest_nodes'=>$quest_nodes, 'health'=> $row_health, 
+		'energy'=> $row_energy, 'level'=> $row_level, 'experience'=> $row_experience, 'posx'=> $row_posx, 'posy'=> $row_posy, 'posz'=>$row_posz, 'yaw'=> $row_yaw,
+		'current_port'=> $current_port, 'in_instance'=> $in_instance, 'has_entered'=> $has_entered, 'previous_port'=> $previous_port,
+		'pp_posx'=> $pp_posx, 'pp_posy'=> $pp_posy, 'pp_posz'=> $pp_posz, 'pp_yaw'=> $pp_yaw ));
+		
+	}
 }
 
 else echo  json_encode(array('status'=>'Character id '.$charid.' not found '));

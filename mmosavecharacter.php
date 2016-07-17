@@ -18,7 +18,7 @@ $dialogues = $mydata ->dialogues;
 $quests = $mydata ->quests;
 $quest_nodes = $mydata ->quest_nodes;
 
-$map_name = $mydata ->map_name;
+$current_port = $mydata ->current_port;
 $posx = $mydata ->posx;
 $posy = $mydata ->posy;
 $posz = $mydata ->posz;
@@ -27,13 +27,34 @@ $has_entered = $mydata ->has_entered;
 
 $yaw = $mydata ->yaw;
 
-$stmt = $conn->prepare("UPDATE characters SET health = ?, energy = ?, experience = ?, level = ?, map_name = ?, posx = ?, posy = ?, posz = ?, yaw = ?, in_instance = ?, has_entered = ? WHERE id = ? ");
+$stmt = $conn->prepare("UPDATE characters SET health = ?, energy = ?, experience = ?, level = ?, current_port = ?, posx = ?, posy = ?, posz = ?, yaw = ?, in_instance = ?, has_entered = ? WHERE id = ? ");
 
-$stmt->bind_param("iiiisiiiiiii", $health, $energy, $experience, $level, $map_name, $posx, $posy, $posz, $yaw, $in_instance?1:0, $has_entered?1:0, $charid);  // "s" means the database expects a string
+$stmt->bind_param("iiiiiiiiiiii", $health, $energy, $experience, $level, $current_port, $posx, $posy, $posz, $yaw, $in_instance, $has_entered, $charid);  // "s" means the database expects a string
 
 $stmt->execute();
 	
 $stmt->close();
+
+if ($in_instance == 1) {
+	
+	$previous_port = $mydata ->previous_port;
+	$pp_posx = $mydata ->pp_posx;
+	$pp_posy = $mydata ->pp_posy;
+	$pp_posz = $mydata ->pp_posz;
+	$pp_yaw = $mydata ->pp_yaw;
+	
+	$stmt = $conn->prepare("UPDATE characters SET health = ?, energy = ?, experience = ?, level = ?, previous_port = ?, pp_posx = ?, pp_posy = ?, pp_posz = ?, pp_yaw = ?, in_instance = ?, has_entered = ? WHERE id = ? ");
+
+	$stmt->bind_param("iiiiiiiiiiii", $health, $energy, $experience, $level, $previous_port, $pp_posx, $pp_posy, $pp_posz, $pp_yaw, $in_instance, $has_entered, $charid);  // "s" means the database expects a string
+
+	$stmt->execute();
+	
+	$stmt->close();
+	
+	
+}
+
+
 
 $stmt = $conn->prepare("DELETE FROM dialogues WHERE character_id = ? ");
 

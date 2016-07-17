@@ -38,7 +38,7 @@ else {
 
 			$stmt->close();
 			
-			 //id, userid, name. class, gender, health, energy, level, experience, posx, posy, posz, rotation  (yaw), 5 equipment pieces:
+			 //id, userid, name, gender, health, energy, level, experience, posx, posy, posz, rotation  (yaw), 5 equipment pieces:
 		
 			$stmt = $conn->prepare("INSERT INTO characters VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ");
 		
@@ -55,7 +55,7 @@ else {
 			$stmt->close();
 					
 			
-			echo json_encode(array('status'=>"OK" ));
+			echo json_encode(array('status'=>'OK' ));
 		
 		}
 
