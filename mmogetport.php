@@ -6,57 +6,89 @@ $mydata = json_decode(file_get_contents('php://input'));
 
 $server_address = $mydata->server_address;
 
-$stmt = $conn->prepare("SELECT server_id, port FROM instances WHERE server_address = ? ");
+$stmt = $conn->prepare("SELECT value FROM server_globals WHERE variable = ? ");
 		
-$stmt->bind_param("s", $server_address);
+$stmt->bind_param("s", 'total_released');
 		
 $stmt->execute();
 		
-$stmt->bind_result($server_id, $port );
+$stmt->bind_result( $total_released );
 
-while ($stmt->fetch()) {
-		//add to array of ports:	
-		$portarray[] = array('server_address' => $server_address, 'server_id' => $server_id, 'port' => $port);
-}
+$stmt->fetch();
 
-for ($portcount = 8001; ; $portcount++) {
+$stmt = $conn->prepare("SELECT value FROM server_globals WHERE variable = ? ");
+		
+$stmt->bind_param("s", 'total_instances');
+		
+$stmt->execute();
+		
+$stmt->bind_result( $total_instances );
 
-	$port_found = binsearch($portcount, $portarray);
+$stmt->fetch();
 
-	if($port_found == false) {
-		break;
-	}
-	else {
+if($total_released > 0) {
 	
-		if(portarray[$port_found].server_id == NULL){
-			break;
-		}
+	$stmt = $conn->prepare("SELECT port FROM released_instances WHERE server_address = ? ");
+		
+	$stmt->bind_param("s", $server_address);
+		
+	$stmt->execute();
+		
+	$stmt->bind_result( $reused_port );
+
+	if($stmt->fetch()) {
+
+		$stmt = $conn->prepare("DELETE FROM released_instances WHERE server_address = ? AND port = ?");
+		
+		$stmt->bind_param("si", $server_address, $reused_port);
+		
+		$stmt->execute();
+		
+		$total_released--;
+		
+		$stmt = $conn->prepare("UPDATE server_globals SET value = ? WHERE variable = ? ");
+		
+		$stmt->bind_param("is", $total_released, 'total_released');
+		
+		$stmt->execute();
+		
+		$stmt = $conn->prepare("INSERT INTO instances (server_address, port) VALUES (?, ?");
+		
+		$stmt->bind_param("si", $server_address, $reused_port);
+		
+		$stmt->execute();
+		
+		$total_instances++;
+		
+		$stmt = $conn->prepare("UPDATE server_globals SET value = ? WHERE variable = ? ");
+		
+		$stmt->bind_param("is", $total_instances, 'total_instances');
+		
+		$stmt->execute();
+			
+		echo json_encode(array('status'=>'OK', 'port'=>$reused_port ));
 	}
 }
 
-echo json_encode(array('status'=>'OK', 'port'=>$portcount ));
-
-
-
-
-function binsearch($needle, $haystack)
-{
-    $high = count($haystack);
-    $low = 0;
-    
-    while ($high - $low > 1){
-        $probe = ($high + $low) / 2;
-        if ($haystack[$probe] < $needle){
-            $low = $probe;
-        }else{
-            $high = $probe;
-        }
-    }
-
-    if ($high == count($haystack) || $haystack[$high] != $needle) {
-        return false;
-    }else {
-        return $high;
-    }
+else {
+	
+	$total_instances++;
+	
+	$port = $total_instances + 30000;
+	
+	$stmt = $conn->prepare("INSERT INTO instances (server_address, port) VALUES (?, ?");
+		
+	$stmt->bind_param("si", $server_address, $port);
+		
+	$stmt->execute();
+		
+	$stmt = $conn->prepare("UPDATE server_globals SET value = ? WHERE variable = ? ");
+		
+	$stmt->bind_param("is", $total_instances, 'total_instances');
+		
+	$stmt->execute();
+	
+	echo json_encode(array('status'=>'OK', 'port'=>$port ));	
 }
+
 ?>
