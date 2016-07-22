@@ -5,7 +5,8 @@ $mydata = json_decode(file_get_contents('php://input'));
 $charid = $mydata ->charid;
 $userid = $mydata ->userid;
 
-$stmt = $conn->prepare("SELECT name, health, energy, level, experience, posx, posy, posz, yaw, in_instance, has_entered, previous_port, current_port, pp_posx, pp_posy, pp_posz, pp_yaw FROM characters WHERE id = ? ");
+$stmt = $conn->prepare("SELECT name, health, energy, level, experience, posx, posy, posz, yaw, in_instance, has_entered, previous_port,
+current_port, pp_posx, pp_posy, pp_posz, pp_yaw FROM characters WHERE id = ? ");
 
 $stmt->bind_param("i", $charid);  // "i" means the database expects an integer
 
