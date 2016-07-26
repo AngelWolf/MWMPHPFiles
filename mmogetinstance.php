@@ -7,7 +7,7 @@ $stmt = $conn->prepare("SELECT MIN(port) FROM instances WHERE server_address = ?
 $stmt->bind_param("s", $server_address);
 $stmt->execute();
 $stmt->bind_result( $port_to_use );
-if (mysql_num_rows($port_to_use)==0) {
+if ($port_to_use == 0) {
 	$stmt = $conn->prepare("SELECT COUNT(*) FROM instances WHERE server_address = ? ");
 	$stmt->bind_param("s", $server_address);
 	$stmt->execute();
